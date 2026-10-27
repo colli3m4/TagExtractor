@@ -1,0 +1,40 @@
+@startuml
+title TagExtractor - Class and File Flow
+left to right direction
+skinparam classAttributeIconSize 0
+
+class Main {
+  +main(args: String[]): void
+}
+
+class TagExtractor <<utility>> {
+  -{static} DEFAULT_INPUT: Path
+  -{static} DEFAULT_STOP_WORDS: Path
+  -{static} DEFAULT_OUTPUT: Path
+  -{static} MAX_TAGS: int
+  -{static} WORD_PATTERN: Pattern
+  +{static} main(args: String[]): void
+  -{static} loadStopWords(path: Path): Set<String>
+  -{static} readLiteratureText(path: Path): String
+  -{static} countTags(text: String, stopWords: Set<String>): Map<String, Integer>
+  -{static} rankTags(frequencies: Map<String, Integer>): List<Entry<String, Integer>>
+  -{static} writeTags(path: Path, tags: List<Entry<String, Integer>>): void
+}
+
+artifact "data/pride-and-prejudice.txt" as Literature
+artifact "data/stopwords.txt" as StopWords
+artifact "output/tags.txt" as TagFile
+
+Main ..> TagExtractor : delegates
+TagExtractor ..> Literature : reads text
+TagExtractor ..> StopWords : loads filter words
+TagExtractor ..> TagFile : writes ranked tags
+
+note right of TagExtractor
+  Pipeline:
+  read text and stop words
+  -> normalize and count words
+  -> rank by frequency
+  -> write the top 100
+end note
+@enduml

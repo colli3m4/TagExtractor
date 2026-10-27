@@ -20,6 +20,11 @@ To use other files, pass exactly three program arguments:
 The output contains a `tag` / `count` header and is sorted by descending frequency,
 then alphabetically for ties.
 
+## UML diagram
+
+`TagExtractorUML.puml` shows the program classes and the flow between the
+literature input, stop-words file, and generated tags.
+
 ## Included literature
 
 `data/pride-and-prejudice.txt` is *Pride and Prejudice* by Jane Austen, downloaded
