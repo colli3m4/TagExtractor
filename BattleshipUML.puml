@@ -1,0 +1,119 @@
+@startuml
+skinparam classAttributeIconSize 0
+
+class Main {
+  +main(args: String[]): void
+}
+
+class BattleshipFrame {
+  -game: BattleshipGame
+  -playerCells: JButton[][]
+  -opponentCells: JButton[][]
+  -statusLabel: JLabel
+  +BattleshipFrame()
+  -takeTurn(row: int, column: int): void
+  -createBoardPanel(title: String, cells: JButton[][], targetable: boolean): JPanel
+  -axisLabel(text: String): JLabel
+  -outcomeText(shooter: String, outcome: ShotOutcome): String
+  -startNewGame(): void
+  -refreshBoards(): void
+  -updateCell(cell: JButton, board: Board, coordinate: Coordinate, revealShips: boolean): void
+}
+
+class BattleshipGame {
+  -random: Random
+  -playerBoard: Board
+  -opponentBoard: Board
+  -gameOver: boolean
+  -playerWon: boolean
+  +newGame(): void
+  +fireAt(target: Coordinate): GameTurnResult
+  +getPlayerBoard(): Board
+  +getOpponentBoard(): Board
+  -createRandomBoard(): Board
+}
+
+class Board {
+  {static} +SIZE: int
+  -ships: Ship[][]
+  -shots: boolean[][]
+  -fleet: List<Ship>
+  +placeShip(type: ShipType, start: Coordinate, horizontal: boolean): boolean
+  +receiveShot(coordinate: Coordinate): ShotOutcome
+  +wasShotAt(coordinate: Coordinate): boolean
+  +getShipAt(coordinate: Coordinate): Ship
+  +hasRemainingShips(): boolean
+  +getUntargetedCoordinates(): List<Coordinate>
+  -isInBounds(row: int, column: int): boolean
+}
+
+class Ship {
+  -type: ShipType
+  -locations: Set<Coordinate>
+  -hits: Set<Coordinate>
+  +Ship(type: ShipType, start: Coordinate, horizontal: boolean)
+  +getType(): ShipType
+  +occupies(coordinate: Coordinate): boolean
+  +isSunk(): boolean
+  +registerHit(coordinate: Coordinate): void
+}
+
+class Coordinate {
+  -row: int
+  -column: int
+  +Coordinate(row: int, column: int)
+  +getRow(): int
+  +getColumn(): int
+  +equals(other: Object): boolean
+  +hashCode(): int
+}
+
+enum ShipType {
+  CARRIER
+  BATTLESHIP
+  CRUISER
+  SUBMARINE
+  DESTROYER
+  -displayName: String
+  -length: int
+  +getDisplayName(): String
+  +getLength(): int
+}
+
+enum ShotOutcome {
+  MISS
+  HIT
+  SUNK
+}
+
+class GameTurnResult {
+  -playerTarget: Coordinate
+  -playerOutcome: ShotOutcome
+  -computerTarget: Coordinate
+  -computerOutcome: ShotOutcome
+  -gameOver: boolean
+  -playerWon: boolean
+  +GameTurnResult(playerTarget: Coordinate, playerOutcome: ShotOutcome, computerTarget: Coordinate, computerOutcome: ShotOutcome, gameOver: boolean, playerWon: boolean)
+  +getPlayerTarget(): Coordinate
+  +getPlayerOutcome(): ShotOutcome
+  +getComputerTarget(): Coordinate
+  +getComputerOutcome(): ShotOutcome
+  +isGameOver(): boolean
+  +isPlayerWon(): boolean
+}
+
+class JFrame <<Swing>>
+BattleshipFrame --|> JFrame
+Main ..> BattleshipFrame : launches
+BattleshipFrame *-- BattleshipGame
+BattleshipFrame ..> GameTurnResult : displays
+BattleshipGame *-- "2" Board : player/opponent
+BattleshipGame ..> GameTurnResult : returns
+Board *-- "0..5" Ship : fleet
+Board ..> Coordinate
+Board ..> ShotOutcome
+Ship --> ShipType
+Ship ..> Coordinate
+GameTurnResult --> Coordinate
+GameTurnResult --> ShotOutcome
+@enduml
